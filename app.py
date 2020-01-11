@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask import request
 app = Flask(__name__)
 
 
@@ -15,9 +16,17 @@ def index():
     return render_template("index.html" , newsLists=lists)
 
 
-@app.route('/login')
+@app.route('/login', methods=['get', 'post'])
 def login():
+    # username = request.args.get("username")
+    # password = request.args.get("password")
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        print(username, password)
     return render_template("login.html")
+
+
 
 @app.route("/register")
 def register():
