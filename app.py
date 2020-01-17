@@ -4,6 +4,8 @@ from libs import db
 from views.users import user_app
 from views.articles import article_app
 from flask_migrate import Migrate
+from models import Category
+
 
 app = Flask(__name__)
 
@@ -38,7 +40,12 @@ def account():
     username = None
     return {"username":username}
 
+@app.context_processor
+def getCateList():
+    cates = Category.query.all()
+    return {"cates":cates}
 
-
-
-migrate = Migrate(app,db)
+# 添加render_as_batch=True
+# SQLite支持批处理修改
+# 但是这种如果修改多个字段，可能在发生错误时，发生修改不一致
+migrate = Migrate(app,db,render_as_batch=True)

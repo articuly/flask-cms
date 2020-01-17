@@ -58,32 +58,16 @@
 				<!-- 必须设置 navbar-nav-->
 				<ul class="nav navbar-nav" >
 					<li class="active"><a href="{{ url_for("index") }}">首页</a></li>
-							<!-- 必须设置dropdown -->
-					<li class="dropdown">
-								<a href="#" data-toggle="dropdown">
-									技术文章
-									<b class="caret"></b>
-								</a>
-								<ul class="dropdown-menu">
-									<li><a href="">Python编程</a></li>
-									<li><a href="">JavaScript编程</a></li>
-									<li><a href="">WEB开发技术</a></li>
-								</ul>
-							</li>
-					<li><a href="">生活随笔</a></li>
-					<li><a href="">关于我</a></li>
-                    <li class="dropdown">
-								<a href="#" data-toggle="dropdown">
-									文章模块
-									<b class="caret"></b>
-								</a>
-								<ul class="dropdown-menu">
-									<li><a href="{{ url_for("article_app.post") }}">发布文章</a></li>
-									<li><a href="{{ url_for("article_app.list") }}">文章管理列表</a></li>
-								</ul>
-                    </li>
+
+					{% for cate in cates %}
+                        <li><a href="{{ url_for("article_app.getArticleList",cate_id=cate.cate_id, page=1) }}">{{ cate.cate_name }}</a> </li>
+                    {% endfor %}
+                   <li><a href="{{ url_for("article_app.list") }}">文章管理</a></li>
+
+
                     <li><a href="{{ url_for("user_app.userList") }}">用户管理</a></li>
-				</ul>
+				    <li><a href="{{ url_for("article_app.cateList") }}">分类管理</a></li>
+                </ul>
                 <ul class="nav navbar-nav pull-right">
                    {% if not username %}
                         <li><a href="{{ url_for("login") }}">登录</a></li>

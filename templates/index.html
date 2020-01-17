@@ -34,16 +34,16 @@
 				<div class="col-md-6">
 					<!-- 媒体列表 -->
 					<ul class="media-list">
-                        {% for news in newsLists %}
+                        {% for article in articles %}
 
                          <li class="media">
 							<a href="" class="pull-left">
 								<img src="img/1.jpeg"  class="media-object">
 							</a>
 							<div class="media-body">
-								<h4 class="media-heading">{{ news.title }}</h4>
+								<h4 class="media-heading">{{ article.title }}</h4>
 								<div class="media">
-									<p>{{ news['intro'] }}</p>
+									<p>{{ article['intro'] }}</p>
 
 								</div>
 							</div>
@@ -55,11 +55,13 @@
 					</ul>
 					<!--  -->
 					<ul class="pagination">
-						<li><a href="?page=1">前一页</a></li>
-						<li><a href="?page=1" >1</a></li>
-						<li class="active"><a href="?page=2" >2</a></li>
-						<li><a href="?page=3" >3</a></li>
-						<li><a href="?page=4">后一页</a></li>
+						{% for page in pageList %}
+                            {% if page!=None %}
+						<li><a href="{{ url_for("article_app.getArticleList", page=page) }}">{{ page }}</a></li>
+                            {% else %}
+                            <li><a href="#">...</a></li>
+                            {% endif %}
+						{% endfor %}
 					</ul>
 				</div>
 				<div class="col-md-4">
