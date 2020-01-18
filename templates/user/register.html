@@ -12,6 +12,11 @@
 				<div class="main col-md-12 col-lg-12 col-xs-12 col-sm-12" >
 
 						<h3>用户注册</h3>
+                     {% if message %}
+                        <div class="alert alert-info" role="alert">
+                                {{ message }}
+                        </div>
+                     {% endif %}
 						 <div class="body">
 							<form action="" method="post">
 								
@@ -37,7 +42,7 @@
 									<input  type="radio" name="sex" id="sex1" value="0" />女
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="sex" id="sex2" value="1" />男
+									<input type="radio" name="sex" id="sex2" value="1" checked />男
 								</label>
 							</div>
 							<div class="form-group">

@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 
 from flask import request, redirect, url_for, render_template
-from libs import db
+from libs import db, login_required
 from models import Article, Category
 from flask import Blueprint
 
@@ -10,6 +10,7 @@ article_app = Blueprint("article_app", __name__)
 
 
 @article_app.route("/post", methods=['get','post'])
+@login_required
 def post():
     if request.method == "POST":
         cate_id = request.form['cate']
@@ -70,6 +71,7 @@ def list(page):
 
 # 根据文章id删除文章
 @article_app.route("/delete/<int:article_id>")
+@login_required
 def delete(article_id):
     article = Article.query.get(article_id)
     db.session.delete(article)
@@ -79,6 +81,7 @@ def delete(article_id):
 
 # 文章修改
 @article_app.route("/edit/<int:article_id>", methods=['get', 'post'])
+@login_required
 def edit(article_id):
     article = Article.query.get(article_id)
     if request.method == "POST":

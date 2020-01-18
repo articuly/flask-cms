@@ -4,13 +4,15 @@ from libs import db
 from views.users import user_app
 from views.articles import article_app
 from flask_migrate import Migrate
-from models import Category
+from models import Category, User
+from flask import session
 
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///my.db"
+app.secret_key = "123456"
 
 db.init_app(app)
 
@@ -24,20 +26,68 @@ def index():
 #
 @app.route('/login', methods=['get', 'post'])
 def login():
-    # username = request.args.get("username")
-    # password = request.args.get("password")
+    message = None
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        print(username, password)
-    return render_template("login.html")
+        user = User.query.filter_by(username=username).first()
+        if user and user.validate_password(password):
+            session['user'] = user.username
+        # 登录成功返回首页
+            return redirect(url_for("index"))
+        else:
+            message = "用户名与密码不匹配"
+    #登录失败，给出提示
+    return render_template("login.html", message=message)
+
+@app.route("/logout")
+def logout():
+    if session.get('user'):
+        session.pop("user")
+
+    return redirect(url_for("index"))
 
 
+# @app.route("/test")
+# def test():
+#     try:
+#         number += 1
+#     except Exception:
+#         number = 0
+#     return "number="+str(number)
+#
+# from flask import  make_response
+# @app.route("/test_cookie")
+# def test_cookie():
+#     # 获取cookie
+#
+#     username = request.cookies.get("username")
+#     response = make_response("<b>"+str(username)+"</b>")
+#     response.set_cookie("number", "10")
+#     return response
+#
+#
+# @app.route("/test_cookie2")
+# def test_cookie2():
+#     number = request.cookies.get("number", "0")
+#     number = int(number)+1
+#     username = request.cookies.get("username")
+#     response = make_response( "<b>number=" + str(number) + "</b>")
+#     response.set_cookie("number", str(number))
+#     return response
+
+@app.route("/test_session")
+def test_session():
+    try:
+        session['number'] += 1
+    except:
+        session['number'] = 0
+    return "number="+str(session['number'])
 
 
 @app.context_processor
 def account():
-    username = None
+    username = session.get('user')
     return {"username":username}
 
 @app.context_processor

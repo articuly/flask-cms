@@ -62,18 +62,19 @@
 					{% for cate in cates %}
                         <li><a href="{{ url_for("article_app.getArticleList",cate_id=cate.cate_id, page=1) }}">{{ cate.cate_name }}</a> </li>
                     {% endfor %}
-                   <li><a href="{{ url_for("article_app.list") }}">文章管理</a></li>
-
-
-                    <li><a href="{{ url_for("user_app.userList") }}">用户管理</a></li>
-				    <li><a href="{{ url_for("article_app.cateList") }}">分类管理</a></li>
+                    {% if username %}
+                        <li><a href="{{ url_for("article_app.list") }}">文章管理</a></li>
+                        <li><a href="{{ url_for("user_app.userList") }}">用户管理</a></li>
+                        <li><a href="{{ url_for("article_app.cateList") }}">分类管理</a></li>
+                    {% endif  %}
                 </ul>
                 <ul class="nav navbar-nav pull-right">
                    {% if not username %}
                         <li><a href="{{ url_for("login") }}">登录</a></li>
                         <li><a href="{{ url_for("user_app.register") }}">注册</a></li>
                    {% else %}
-                       <li><a href="/usercenter">{{ username }}</a></li>
+                       <li><a href="#">{{ username }}</a></li>
+                       <li><a href="{{ url_for("logout") }}">logout</a></li>
 				    {% endif %}
                 </ul>
 			</div>
