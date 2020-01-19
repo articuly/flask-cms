@@ -30,6 +30,9 @@ def post():
         db.session.commit()
         # 由于我们是在article_app模块下
         # 因此url_for中的视图函数名可以省略article_app
+        import json
+        message = {"message":"发布成功"}
+        return json.dumps(message)
         return redirect(url_for(".list"))
 
     return render_template("article/post.html")

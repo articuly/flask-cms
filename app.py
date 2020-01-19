@@ -41,61 +41,13 @@ def login():
     #登录失败，给出提示
     return render_template("login.html", message=message)
 
+
 @app.route("/logout")
 def logout():
     if session.get('user'):
         session.pop("user")
 
     return redirect(url_for("index"))
-
-
-@app.route("/image/upload", methods=['get','post'])
-def upload():
-    file = {
-        "uploaded": 1,
-        "fileName": "foo.jpg",
-        "url": "/files/foo.jpg"
-    }
-    return json.dumps(file)
-
-@app.route("/image/browser")
-def browser():
-    pass
-# @app.route("/test")
-# def test():
-#     try:
-#         number += 1
-#     except Exception:
-#         number = 0
-#     return "number="+str(number)
-#
-# from flask import  make_response
-# @app.route("/test_cookie")
-# def test_cookie():
-#     # 获取cookie
-#
-#     username = request.cookies.get("username")
-#     response = make_response("<b>"+str(username)+"</b>")
-#     response.set_cookie("number", "10")
-#     return response
-#
-#
-# @app.route("/test_cookie2")
-# def test_cookie2():
-#     number = request.cookies.get("number", "0")
-#     number = int(number)+1
-#     username = request.cookies.get("username")
-#     response = make_response( "<b>number=" + str(number) + "</b>")
-#     response.set_cookie("number", str(number))
-#     return response
-
-@app.route("/test_session")
-def test_session():
-    try:
-        session['number'] += 1
-    except:
-        session['number'] = 0
-    return "number="+str(session['number'])
 
 
 @app.context_processor
@@ -107,6 +59,24 @@ def account():
 def getCateList():
     cates = Category.query.all()
     return {"cates":cates}
+
+@app.route("/form", methods=['get', 'post'])
+def test_form():
+    from time import sleep
+    import json
+    message = None
+    if request.method == "POST":
+        pass
+        # sleep(5)
+        # message = "数据处理fail"
+        newstype = request.form['newstype']
+        lists = {
+            "1": ["新闻1", "新闻2", "新闻3"],
+            "2": ["头条1", "头条2", "头条3"]
+        }
+        return json.dumps(lists[newstype])
+    return render_template("ajax/jquery.html")
+
 
 # 添加render_as_batch=True
 # SQLite支持批处理修改
