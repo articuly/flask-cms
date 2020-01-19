@@ -6,7 +6,8 @@ from views.articles import article_app
 from flask_migrate import Migrate
 from models import Category, User
 from flask import session
-
+import json
+from sqlalchemy import MetaData
 
 app = Flask(__name__)
 
@@ -48,6 +49,18 @@ def logout():
     return redirect(url_for("index"))
 
 
+@app.route("/image/upload", methods=['get','post'])
+def upload():
+    file = {
+        "uploaded": 1,
+        "fileName": "foo.jpg",
+        "url": "/files/foo.jpg"
+    }
+    return json.dumps(file)
+
+@app.route("/image/browser")
+def browser():
+    pass
 # @app.route("/test")
 # def test():
 #     try:
@@ -98,4 +111,5 @@ def getCateList():
 # 添加render_as_batch=True
 # SQLite支持批处理修改
 # 但是这种如果修改多个字段，可能在发生错误时，发生修改不一致
+
 migrate = Migrate(app,db,render_as_batch=True)
