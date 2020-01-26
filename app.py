@@ -3,6 +3,7 @@ from flask import request, redirect, url_for
 from libs import db
 from views.users import user_app
 from views.articles import article_app
+from views.upload import upload_app
 from flask_migrate import Migrate
 from models import Category, User
 from flask import session
@@ -13,13 +14,17 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///my.db"
+app.config['ALLOW_UPLOAD_TYPE'] = ["image/jpeg",
+                                    "image/png",
+                                    "image/gif"
+                                  ]
 app.secret_key = "123456"
 
 db.init_app(app)
 
 app.register_blueprint(user_app, url_prefix="/user")
 app.register_blueprint(article_app, url_prefix="/article")
-
+app.register_blueprint(upload_app, url_prefix="/upload")
 @app.route('/')
 def index():
     return render_template("index.html" )

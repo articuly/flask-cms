@@ -38,10 +38,10 @@
 
                          <li class="media">
 							<a href="" class="pull-left">
-								<img src="img/1.jpeg"  class="media-object">
+								<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1579500583651&di=e5e4a680a6ff402c4e710a16670d8aa7&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180427%2Fa7edbf22edbf4756ac126ee282b1086f.jpeg"  class="media-object">
 							</a>
 							<div class="media-body">
-								<h4 class="media-heading">{{ article.title }}</h4>
+								<h4 class="media-heading"><a href="{{ url_for("article_app.view", article_id=article.id) }}">{{ article.title }}</a></h4>
 								<div class="media">
 									<p>{{ article['intro'] }}</p>
 
