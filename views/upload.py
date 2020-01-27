@@ -26,7 +26,7 @@ def upload():
                 message['error'] = "上传文件类型不对"
                 return json.dumps(message)
 
-            # # 使用原名直接保存
+            # 使用新文件名保存
             file_path= os.path.join(get_dir(),
                                     create_filename(file_storage.filename))
             try:
@@ -40,6 +40,57 @@ def upload():
         return json.dumps(message)
 
     return render_template("upload/jquery_upload.html")
+
+@upload_app.route("/ckeditor", methods=['post'])
+def ckeditor_upload():
+    if request.method == "POST":
+        file_storage = request.files.get("upload")
+        message = {
+            "uploaded": "0",
+            "fileName": "",
+            "url"     : "",
+            "error"   : {
+                "message": ""
+            }
+         }
+
+        # 获得上传数据长度
+        if request.content_length > 300*1000:
+            message['uploaded'] = "0"
+            message['error']['message']= "上传文件太大"
+            return json.dumps(message)
+        # 任何时候，后端都不要相信前端
+        # 的数据检测结果，比如上传类型限制，所有必要的检查都须放在
+        # 后端进行检测
+        if file_storage.content_type not in \
+                current_app.config['ALLOW_UPLOAD_TYPE']:
+            message['uploaded'] = "0"
+            message['error']['message'] = "上传文件类型不对"
+            return json.dumps(message)
+
+
+        file_path= os.path.join(get_dir(),
+                                create_filename(file_storage.filename))
+        try:
+            file_storage.save(file_path)
+        except Exception as e:
+            message = {"uploaded":"0","error":str(e)}
+            return json.dumps(message)
+
+        message['fileName'] = file_storage.filename
+        # [1:]将.static/相对路径转为/static绝对路径
+        message['url'] = file_path[1:]
+        message['loaded'] = "1"
+        return json.dumps(message)
+
+
+@upload_app.route("/ckeditor/browser", methods=['get'])
+def ckeditor_browser():
+    images = []
+    for dirpath, dirnames, filenames in os.walk("./static/uploads"):
+        for file in filenames:
+            images.append(os.path.join(dirpath[1:], file))
+    return render_template("upload/browser.html", images=images)
 
 
 def get_dir():
