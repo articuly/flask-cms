@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 {% block head %}
     <head>
 		<meta charset="utf-8">
@@ -38,7 +36,7 @@
 		</style>
 	</head>
 {%  endblock %}
-<body>
+
 {%  block nav %}
       <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
 
@@ -57,36 +55,24 @@
 			<div class="collapse navbar-collapse" id="navmenu">
 				<!-- 必须设置 navbar-nav-->
 				<ul class="nav navbar-nav" >
-					<li class="active"><a href="{{ url_for("index") }}">首页</a></li>
-
-					{% for cate in cates %}
-                        <li><a href="{{ url_for("article_app.getArticleList",cate_id=cate.cate_id, page=1) }}">{{ cate.cate_name }}</a> </li>
-                    {% endfor %}
+					    <li class="active"><a href="{{ url_for("index") }}">返回网站首页</a></li>
+                        <li><a href="{{ url_for("member_app.article_list") }}">我的文章</a></li>
+                        <li><a href="{{ url_for("member_app.userEdit") }}">我的资料</a></li>
 
                 </ul>
+
                 <ul class="nav navbar-nav pull-right">
-                   {% if not username %}
-                        <li><a href="{{ url_for("login") }}">登录</a></li>
-                        <li><a href="{{ url_for("user_app.register") }}">注册</a></li>
-                   {% else %}
-                       <li><a href="{{ url_for("member_app.member_index") }}">欢迎{{ username }}回来</a></li>
-                       {% if username=="admin" %}
-                            <li><a href="{{ url_for("admin_app.admin_index") }}">进入网站后台</a></li>
-                           {% endif %}
+                       <li><a href="#">{{ username }}</a></li>
                        <li><a href="{{ url_for("logout") }}">logout</a></li>
-				    {% endif %}
                 </ul>
 			</div>
 		</nav>
 
 {% endblock %}
 
-
 {% block content %}
-
- 每个页面的不同部分
+    会员后台中心
 {%  endblock %}
-
 
 {% block footer %}
           <footer>
@@ -108,5 +94,3 @@
 		<script type="text/javascript" src="{{ url_for("static" ,filename="js/jquery-3.4.1.min.js") }}"></script>
 		<script type="text/javascript" src="{{ url_for("static" ,filename="js/bootstrap.js") }}"></script>
 {% endblock %}
-</body>
-</html>

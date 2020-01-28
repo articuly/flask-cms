@@ -7,24 +7,25 @@ from views.upload import upload_app
 from flask_migrate import Migrate
 from models import Category, User
 from flask import session
-import json
+from admin import admin_app
+from member import member_app
 from sqlalchemy import MetaData
+from settings import config
+
+
 
 app = Flask(__name__)
+app.config.from_object(config['development'])
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///my.db"
-app.config['ALLOW_UPLOAD_TYPE'] = ["image/jpeg",
-                                    "image/png",
-                                    "image/gif"
-                                  ]
-app.secret_key = "123456"
 
 db.init_app(app)
 
 app.register_blueprint(user_app, url_prefix="/user")
 app.register_blueprint(article_app, url_prefix="/article")
 app.register_blueprint(upload_app, url_prefix="/upload")
+app.register_blueprint(admin_app, url_prefix="/admin")
+app.register_blueprint(member_app, url_prefix="/member")
+
 @app.route('/')
 def index():
     return render_template("index.html" )
