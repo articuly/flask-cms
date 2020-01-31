@@ -84,7 +84,7 @@
                             <td>{{ article.pubdate }}</td>
                             <td>
                                 <a href="{{ url_for("admin_app.article_edit", article_id=article.id) }}">修改</a>
-                                <a href="{{ url_for("admin_app.article_delete", article_id=article.id) }}">删除</a>
+                                <a href="#" class="del" data-url="{{ url_for("admin_app.article_delete", article_id=article.id) }}">删除</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -105,5 +105,27 @@
 				</div>
 			</div>
 		</div>
+     <script>
+        window.onload=function(){
+            table = $(".table")
+            table.on("click",del)
+            function del(e){
+                if (e.target.className=="del") {
+                    url = e.target.dataset.url
+                    $.ajax({
+                        url: url,
+                        type: "post",
+                       /* beforeSend:function(xhr){
+                            xhr.setRequestHeader("X-CSRFToken", "{{  csrf_token() }}")
+                        },*/
+                        success: function (data) {
+                            console.log(data)
+                        }
+                    })
+                }
+
+            }
+        }
+    </script>
 {% endblock %}
 

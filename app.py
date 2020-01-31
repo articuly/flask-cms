@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask import request, redirect, url_for
-from libs import db
+from libs import db, ckeditor
 from views.users import user_app
 from views.articles import article_app
 from views.upload import upload_app
@@ -11,7 +11,7 @@ from admin import admin_app
 from member import member_app
 from sqlalchemy import MetaData
 from settings import config
-
+from forms.account_form import LoginForm
 
 
 app = Flask(__name__)
@@ -19,6 +19,7 @@ app.config.from_object(config['development'])
 
 
 db.init_app(app)
+ckeditor.init_app(app)
 
 app.register_blueprint(user_app, url_prefix="/user")
 app.register_blueprint(article_app, url_prefix="/article")
@@ -33,8 +34,10 @@ def index():
 #
 @app.route('/login', methods=['get', 'post'])
 def login():
+    form = LoginForm()
     message = None
     if request.method == "POST":
+        print(request.form.get("remember"))
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
@@ -45,7 +48,9 @@ def login():
         else:
             message = "用户名与密码不匹配"
     #登录失败，给出提示
-    return render_template("login.html", message=message)
+    return render_template("login.html", message=message,
+                            form=form
+                           )
 
 
 @app.route("/logout")
@@ -66,22 +71,6 @@ def getCateList():
     cates = Category.query.all()
     return {"cates":cates}
 
-@app.route("/form", methods=['get', 'post'])
-def test_form():
-    from time import sleep
-    import json
-    message = None
-    if request.method == "POST":
-        pass
-        # sleep(5)
-        # message = "数据处理fail"
-        newstype = request.form['newstype']
-        lists = {
-            "1": ["新闻1", "新闻2", "新闻3"],
-            "2": ["头条1", "头条2", "头条3"]
-        }
-        return json.dumps(lists[newstype])
-    return render_template("ajax/jquery.html")
 
 
 # 添加render_as_batch=True

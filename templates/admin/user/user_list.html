@@ -96,7 +96,7 @@
 					<ul class="pagination">
                         {% for page in pageList %}
                             {% if page!=None %}
-						<li><a href="{{ url_for("user_app.userList", page=page) }}">{{ page }}</a></li>
+						<li><a href="{{ url_for("admin_app.userList", page=page) }}">{{ page }}</a></li>
                             {% else %}
                             <li><a href="#">...</a></li>
                             {% endif %}

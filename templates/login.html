@@ -12,19 +12,19 @@
                                         {{ message }}
                                 </div>
                             {% endif %}
+
 							<form action="" method="post">
-						
+
+                                {% for field in form %}
+                                    {% if field.widget.input_type!="hidden" %}
 								<div class="form-group">
-									<label for="username">用户名:</label>
-									<input class="form-control"type="text" name="username" id="username" placeholder="请填写您的用户名" />
+									{{ field.label }}
+									{{ field }}
 								</div>
-								<div class="form-group">
-									<label for="password">密码:</label>
-									<input class="form-control"type="password" name="password" id="password" placeholder="设置一个密码"/>
-								</div>
-								<div class="form-group">
-									<input class="btn" type="submit" name="submit" id="btn1" value="立即登录" />
-								</div>
+                                    {% else %}
+                                      {{ field }}
+                                    {% endif %}
+								{% endfor %}
 							</form>
 						 </div>
 

@@ -67,7 +67,7 @@ def article_list(page):
 
 
 # 根据文章id删除文章
-@admin_app.route("/article/delete/<int:article_id>")
+@admin_app.route("/article/delete/<int:article_id>", methods=['post'])
 def article_delete(article_id):
     article = Article.query.get(article_id)
     db.session.delete(article)
