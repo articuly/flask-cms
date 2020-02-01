@@ -35,10 +35,4 @@
 		</div>
 
 	{%  endblock %}
-{% block footer%}
-{#  {{ super() }}#}
 
-   <script src="{{ url_for("static", filename="ckeditor/ckeditor.js") }}"></script>
-{#     可以传入新的配置覆盖app.config配置，比如height#}
-    {{ ckeditor.config("intro",height=500) }}
-{% endblock %}

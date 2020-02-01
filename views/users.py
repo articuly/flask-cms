@@ -13,18 +13,19 @@ user_app = Blueprint("user_app", __name__)
 def register():
     form = RegisterForm()
     message= None
-    if request.method == "POST":
-        if validate_username(request.form['username']):
+    # if request.method == "POST":
+    if form.validate_on_submit():
+        if validate_username(form.data['username']):
             return render_template("user/register.html",
                                    message="用户名重复")
 
-        realname = request.form['name']
-        username = request.form['username']
-        password = request.form['password']
-        sex = request.form['sex']
-        mylike   = '|'.join(request.form.getlist('like'))
-        city     = request.form['city']
-        intro    = request.form['intro']
+        realname = form.data['name']
+        username = form.data['username']
+        password = form.data['password']
+        sex = form.data['sex']
+        mylike   = '|'.join(form.data['like'])
+        city     = form.data['city']
+        intro    = form.data['intro']
         user = User(realname=realname,
                     username=username,
                     sex=sex,
@@ -39,6 +40,8 @@ def register():
             return redirect(url_for("login"))
         except Exception as e:
             message = "注册失败:" + str(e)
+    else:
+        print(form.errors)
     return render_template("user/register.html", message=message, form=form)
 
 # 验证用户名是否重复

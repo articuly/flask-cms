@@ -60,7 +60,7 @@ def userList(page):
 
 
 # 根据用户id删除用户
-@admin_app.route("/delete/<int:user_id>")
+@admin_app.route("/user/delete/<int:user_id>")
 def deleteUser(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)

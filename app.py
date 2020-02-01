@@ -36,10 +36,9 @@ def index():
 def login():
     form = LoginForm()
     message = None
-    if request.method == "POST":
-        print(request.form.get("remember"))
-        username = request.form['username']
-        password = request.form['password']
+    if  form.validate_on_submit():
+        username = form.data['username']
+        password = form.data['password']
         user = User.query.filter_by(username=username).first()
         if user and user.validate_password(password):
             session['user'] = user.username
@@ -47,6 +46,9 @@ def login():
             return redirect(url_for("index"))
         else:
             message = "用户名与密码不匹配"
+    else:
+        print(form.errors)
+
     #登录失败，给出提示
     return render_template("login.html", message=message,
                             form=form
