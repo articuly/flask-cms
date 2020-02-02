@@ -1,23 +1,14 @@
 # -*- coding=utf-8 -*-
 
+import json
 from flask import request,session,render_template,\
                   redirect, url_for
 
 from .admin_app import admin_app
 from models import User
-from libs import db
+from libs import db, csrf
 import json
 
-# 验证用户名是否重复
-def validate_username(username):
-    return User.query.filter_by(username=username).first()
-
-
-
-# 获得用户列表
-# 如果用户刚进入列表页是访问http://127.0.0.1/user/list
-# 与"/list/<int:page>"不匹配，提供一个默认带有page默认值
-# 的路由
 
 @admin_app.route("/user/list/<int:page>", methods=['get', "post"])
 @admin_app.route("/user/list", defaults={"page":1},methods=['get', "post"])
@@ -60,12 +51,20 @@ def userList(page):
 
 
 # 根据用户id删除用户
-@admin_app.route("/user/delete/<int:user_id>")
-def deleteUser(user_id):
+@admin_app.route("/user/delete", methods=['post'])
+def deleteUser():
+    csrf.protect()
+    user_id = int(request.form.get("user_id"))
     user = User.query.get(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    return redirect(url_for(".userList"))
+    message = {}
+    try:
+        db.session.delete(user)
+        db.session.commit()
+    except:
+        message['result'] = "fail"
+    else:
+        message['result'] = "success"
+    return json.dumps(message)
 
 
 # 用户信息修改
