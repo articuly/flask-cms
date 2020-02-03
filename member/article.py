@@ -14,11 +14,13 @@ def article_post():
     if request.method == "POST":
         cate_id = request.form['cate']
         title = request.form['title']
+        thumb = request.form['thumb']
         intro    = request.form['intro']
         content  = request.form['content']
         article = Article(
                     cate_id = cate_id,
                     title=title,
+                    thumb=thumb,
                     intro=intro,
                     content=content,
                     author=session['user']

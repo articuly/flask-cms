@@ -6,8 +6,10 @@
 
     }
 {% endblock %}
+
 		{% block content %}
-		
+		{{ dropzone.load_css() }}
+        {{ dropzone.load_js() }}
 		<div class="container-fluid">
 			<div class="row">
 				
@@ -18,7 +20,7 @@
 
                         </div>
 						 <div class="body">
-							<form action="" method="post">
+
                             <div class="form-group">
 								<label for="cate">文章分类:</label>
                                 <select name="cate" id="cate" class="form-control">
@@ -30,7 +32,9 @@
 							<div class="form-group">
 								<label for="name">标题:</label>
 								<input class="form-control"  type="text" name="title" id="title" value="" placeholder="文章标题">
-							</div>
+							    {{ dropzone.create(action="upload.ckeditor_upload") }}
+                                <input type="hidden" name="thumb" id="thumb">
+                            </div>
 
 							<div class="form-group">
                                 <textarea name="intro" rows="5" cols="10" id="intro" class="form-control" ></textarea>
@@ -43,17 +47,34 @@
 							<input class="btn" type="button" name="btn" id="btn1" value="发表文章" />
 							<input class="btn" type="reset" name="reset_btn" id="btn2" value="重设" />
 							</div>
-							</form>
+
 						 </div>
 
 				</div>
 			</div>
 		</div>
+{#            这里一定要将后台的上传视图返回的数据使用flask.jsonify处理 #}
+             {{   dropzone.config(
+                        custom_init='this.on("success", function(file, res) {
+                        if( file.xhr.status == 200 ){
+                           $("#thumb").val(res.url)
+                           console.log(res)
+                        }else{
+                            alert("上传失败");
+                        }
+                         });'
+                    )
+             }}
             <script src="{{ url_for('static', filename="ckeditor/ckeditor.js") }}"></script>
             <script>
                 CKEDITOR.replace( 'content',{
                     filebrowserUploadUrl :'/upload/ckeditor',
-                    filebrowserBrowseUrl:'/upload/ckeditor/browser'
+                    filebrowserBrowseUrl:'/upload/ckeditor/browser',
+                    //CSRF启用后，需要按照CSRF要求传递CSRF_TOKEN
+                    fileTools_requestHeaders :{
+                             'X-Requested-With': 'XMLHttpRequest',
+                             'X-CSRF-Token': '{{ csrf_token() }}'
+                           }
 
                 })
             </script>
@@ -62,6 +83,7 @@
                 btn.onclick = function (ev) {
                     cate_id = $("#cate").val()
                     title = $("#title").val()
+                    thumb = $("#thumb").val()
                     intro = $("#intro").val()
                     content = CKEDITOR.instances["content"].getData()
 
@@ -78,14 +100,24 @@
                          type:"post",
                          data:{"cate":cate_id,
                                "title":title,
+                               "thumb":thumb,
                                "intro":intro,
                                "content":content
                                },
                          dataType:"json",
+                         beforeSend:function(xhr){
+                            xhr.setRequestHeader("X-CSRFToken", "{{  csrf_token() }}")
+                         },
                          success: function(data){
                              $("#message").html(data.message)
                              //表单重置，相当于点击重设按钮
-                             $("form")[0].reset()
+                             $("#title").val("")
+                             $("#intro").val()
+                             // 清空隐藏域
+                             $("#thumb").val("")
+                             // 清空上传
+                             myDropzone.dropzone.removeAllFiles()
+                             // 清空ckeditor
                              CKEDITOR.instances["content"].setData()
                          }
                     })

@@ -3,7 +3,8 @@ import os
 from flask import Blueprint, request, render_template
 from flask import current_app
 import json
-from libs import login_required
+from libs import login_required, csrf
+from flask import jsonify
 
 upload_app = Blueprint("upload", __name__)
 
@@ -49,6 +50,8 @@ def upload():
 
 @upload_app.route("/ckeditor", methods=['post'])
 def ckeditor_upload():
+    # ckeditor上传启用csrf保护
+    csrf.protect()
     if request.method == "POST":
         file_storage = request.files.get("upload")
         message = {
@@ -87,7 +90,7 @@ def ckeditor_upload():
         # [1:]将.static/相对路径转为/static绝对路径
         message['url'] = file_path[1:]
         message['loaded'] = "1"
-        return json.dumps(message)
+        return jsonify(message)
 
 
 @upload_app.route("/ckeditor/browser", methods=['get'])

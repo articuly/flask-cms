@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask import request, redirect, url_for
-from libs import db, ckeditor, csrf
+from libs import db, ckeditor, csrf, dropzone
 from views.users import user_app
 from views.articles import article_app
 from views.upload import upload_app
@@ -21,6 +21,7 @@ app.config.from_object(config['development'])
 db.init_app(app)
 ckeditor.init_app(app)
 csrf.init_app(app)
+dropzone.init_app(app)
 
 app.register_blueprint(user_app, url_prefix="/user")
 app.register_blueprint(article_app, url_prefix="/article")
