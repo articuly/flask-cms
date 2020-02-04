@@ -112,3 +112,60 @@ class RegisterForm(FlaskForm):
     def validate_username(self, field):
         if field.data.find("admin") != -1:
             raise ValidationError("不能包含敏感字")
+
+
+# ###################################################
+# 用户信息修改表单
+# 有些注册信息是不允许修改的，比如用户名
+# 有些信息只能管理员修改，比如会员等级，状态
+# ###################################################
+class EditInfoForm(FlaskForm):
+    name = StringField("真实姓名",
+                       validators=[DataRequired()],
+                       render_kw={"class":"form-control"})
+
+    sex = RadioField("选择性别",coerce = int,
+                     choices=[(1, '男'), (0, "女")]
+                     )
+
+    like = CheckBoxField("选择爱好",
+                     choices=[("钓鱼", "钓鱼"), ("游泳", "游泳")],
+                     render_kw={"class": "checkbox-inline"})
+
+    city = SelectField('选择城市', choices=[
+        ('010', '北京'),
+        ('021', '上海'),
+        ('0512', '苏州')
+
+    ], render_kw={"class": "form-control"})
+
+    intro = TextAreaField("简介", render_kw={"class": "form-control"} )
+
+# ###################################################
+# 管理员的用户信息修改表单
+# 管理员通常可以修改用户一些不能修改的信息
+# 可以修改的信息并不一定是用户注册的信息，比如用户等级
+
+class AdminEditInfoForm(FlaskForm):
+    name = StringField("真实姓名",
+                       validators=[DataRequired()],
+                       render_kw={"class":"form-control"})
+
+    sex = RadioField("选择性别",coerce = int,
+                     choices=[(1, '男'), (0, "女")]
+                     )
+
+    like = CheckBoxField("选择爱好",
+                     choices=[("钓鱼", "钓鱼"), ("游泳", "游泳")],
+                     render_kw={"class": "checkbox-inline"})
+
+    city = SelectField('选择城市', choices=[
+        ('010', '北京'),
+        ('021', '上海'),
+        ('0512', '苏州')
+
+    ],render_kw={"class":"form-control"})
+
+    intro = TextAreaField("简介", render_kw={"class": "form-control"} )
+
+

@@ -27,6 +27,7 @@ class Article(db.Model):
     intro = db.Column(db.String)
     content = db.Column(db.Text)
     author = db.Column(db.String)
+    is_recommend = db.Column(db.Integer)
     pubdate = db.Column(db.DateTime, default=datetime.utcnow)
     cate_id = db.Column(db.Integer, db.ForeignKey("category.cate_id"))
 

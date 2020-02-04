@@ -31,7 +31,7 @@ app.register_blueprint(member_app, url_prefix="/member")
 
 @app.route('/')
 def index():
-    return render_template("index.html" )
+    return  redirect(url_for("article_app.getArticleList",cate_id=1,page=1))
 
 #
 @app.route('/login', methods=['get', 'post'])

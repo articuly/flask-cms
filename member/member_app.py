@@ -16,5 +16,4 @@ def is_login():
 
 @member_app.route("/")
 def member_index():
-    print("hello")
     return render_template("member/member_index.html")

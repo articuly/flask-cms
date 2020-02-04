@@ -1,63 +1,59 @@
 {% extends "member/member_base.html" %}
-<!DOCTYPE html>
-<html>
 
-	<body>
 	
 		{% block content %}
-		
+        {{ dropzone.load_css() }}
+        {{ dropzone.load_js() }}
 		<div class="container-fluid">
 			<div class="row">
-				
+
 				<div class="main col-md-12 col-lg-12 col-xs-12 col-sm-12" >
 
 						<h3>文章修改</h3>
 						 <div class="body">
-							<form action="" method="post">
-                            <div class="form-group">
-								<label for="cate">文章分类:</label>
-                                <select name="cate" id="cate" class="form-control">
-                                    {% for cate in cates %}
-                                        <option value="{{ cate.cate_id }}"
-                                           {% if article.cate_id == cate.cate_id %}
-                                                selected
-                                           {% endif %}
-                                        >{{ cate.cate_name }}</option>
-                                    {% endfor %}
-                                </select>
-							</div>
-							<div class="form-group">
-								<label for="name">标题:</label>
-								<input class="form-control" type="text" name="title" id="title" value="{{ article.title }}"  />
-							</div>
-							
+                             <div class="alert alert-info" id="message" role="alert"></div>
+                             {%  for field in form %}
 
-							<div class="form-group">
-                                <textarea name="intro" rows="5" cols="10" class="form-control" >
-                                    {{- article.intro -}}
-                                </textarea>
-							</div>
+                                {% if field.widget.input_type!="hidden" %}
+                                        <div class="form-group">
+                                            {{ field.label }}
+                                            {{ field }}
+                                        </div>
+                                    {% else %}
+                                        {{ field }}
+                                        {% if field.name=="thumb" %}
+                                            {{ dropzone.create(action="upload.ckeditor_upload") }}
+                                        {% endif %}
+                                {% endif %}
+                             {% endfor %}
 
                             <div class="form-group">
-                                <textarea name="content" rows="30" cols="10" class="form-control" >
-                                    {{- article.content -}}
-                                </textarea>
-							</div>
+                                <input class="btn" type="button" name="submit" id="btn1" value="确认修改" />
+                                <input class="btn" type="reset" name="reset" id="btn2" value="重设" />
+                            </div>
 
-							<div class="form-group">
-							<input class="btn" type="submit" name="submit" id="btn1" value="确认修改" />
-							<input class="btn" type="reset" name="reset" id="btn2" value="重设" />
-							</div>
-							</form>
+
 						 </div>
-					</article>
 				</div>
 			</div>
 		</div>
+            {{   dropzone.config(
+                        custom_init='this.on("success", function(file, res) {
+                        if( file.xhr.status == 200 ){
+                           $("#thumb").val(res.url)
+                           console.log(res)
+                        }else{
+                            alert("上传失败");
+                        }
+                         });'
+                    )
+             }}
             <script src="{{ url_for('static', filename="ckeditor/ckeditor.js") }}"></script>
             <script>
-                CKEDITOR.replace( 'content')
+               upload_url = "{{ url_for("upload.ckeditor_upload") }}"
+               browser_url = "{{ url_for("upload.ckeditor_browser") }}"
+               csrf_token = "{{ csrf_token() }}"
             </script>
+            <script src="{{ url_for("static",filename="js/article/ckeditor_settings.js") }}"></script>
+            <script src="{{ url_for('static', filename="js/article/edit.js") }}"></script>
 	{%  endblock %}
-	</body>
-</html>

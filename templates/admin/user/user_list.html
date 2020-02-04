@@ -121,7 +121,6 @@
                         xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token()}}')
                     },
                     success: function(data){
-                        console.log(data)
                         if (data.result=="success"){
                             $("#user_"+userid).html(
                                 "<td colspan=6>" + "删除成功"+"</td>")

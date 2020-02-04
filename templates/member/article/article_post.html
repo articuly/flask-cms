@@ -21,28 +21,21 @@
                         </div>
 						 <div class="body">
 
-                            <div class="form-group">
-								<label for="cate">文章分类:</label>
-                                <select name="cate" id="cate" class="form-control">
-                                    {% for cate in cates %}
-                                        <option value="{{ cate.cate_id }}">{{ cate.cate_name }}</option>
-                                    {% endfor %}
-                                </select>
-							</div>
-							<div class="form-group">
-								<label for="name">标题:</label>
-								<input class="form-control"  type="text" name="title" id="title" value="" placeholder="文章标题">
-							    {{ dropzone.create(action="upload.ckeditor_upload") }}
-                                <input type="hidden" name="thumb" id="thumb">
-                            </div>
+                            {%  for field in form %}
 
-							<div class="form-group">
-                                <textarea name="intro" rows="5" cols="10" id="intro" class="form-control" ></textarea>
-							</div>
+                                {% if field.widget.input_type!="hidden" %}
+                                        <div class="form-group">
+                                            {{ field.label }}
+                                            {{ field }}
+                                        </div>
+                                    {% else %}
+                                        {{ field }}
+                                        {% if field.name=="thumb" %}
+                                            {{ dropzone.create(action="upload.ckeditor_upload") }}
+                                        {% endif %}
+                                    {% endif %}
+                            {% endfor %}
 
-                            <div class="form-group">
-                                <textarea name="content" id="content" rows="30" cols="10" class="form-control" ></textarea>
-							</div>
 							<div class="form-group">
 							<input class="btn" type="button" name="btn" id="btn1" value="发表文章" />
 							<input class="btn" type="reset" name="reset_btn" id="btn2" value="重设" />
@@ -67,61 +60,10 @@
              }}
             <script src="{{ url_for('static', filename="ckeditor/ckeditor.js") }}"></script>
             <script>
-                CKEDITOR.replace( 'content',{
-                    filebrowserUploadUrl :'/upload/ckeditor',
-                    filebrowserBrowseUrl:'/upload/ckeditor/browser',
-                    //CSRF启用后，需要按照CSRF要求传递CSRF_TOKEN
-                    fileTools_requestHeaders :{
-                             'X-Requested-With': 'XMLHttpRequest',
-                             'X-CSRF-Token': '{{ csrf_token() }}'
-                           }
-
-                })
+               upload_url = "{{ url_for("upload.ckeditor_upload") }}"
+               browser_url = "{{ url_for("upload.ckeditor_browser") }}"
+               csrf_token = "{{ csrf_token() }}"
             </script>
-            <script>
-                btn = document.getElementById("btn1")
-                btn.onclick = function (ev) {
-                    cate_id = $("#cate").val()
-                    title = $("#title").val()
-                    thumb = $("#thumb").val()
-                    intro = $("#intro").val()
-                    content = CKEDITOR.instances["content"].getData()
-
-                    if (title == ""){
-                        $("#title").focus()
-                        return false
-                    }
-                    if (intro == ""){
-                        $("#intro").focus()
-                        return false
-                    }
-
-                    $.ajax({
-                         type:"post",
-                         data:{"cate":cate_id,
-                               "title":title,
-                               "thumb":thumb,
-                               "intro":intro,
-                               "content":content
-                               },
-                         dataType:"json",
-                         beforeSend:function(xhr){
-                            xhr.setRequestHeader("X-CSRFToken", "{{  csrf_token() }}")
-                         },
-                         success: function(data){
-                             $("#message").html(data.message)
-                             //表单重置，相当于点击重设按钮
-                             $("#title").val("")
-                             $("#intro").val()
-                             // 清空隐藏域
-                             $("#thumb").val("")
-                             // 清空上传
-                             myDropzone.dropzone.removeAllFiles()
-                             // 清空ckeditor
-                             CKEDITOR.instances["content"].setData()
-                         }
-                    })
-
-                }
-            </script>
+            <script src="{{ url_for("static",filename="js/article/ckeditor_settings.js") }}"></script>
+            <script src="{{ url_for("static",filename="js/article/post.js") }}"></script>
 	{%  endblock %}

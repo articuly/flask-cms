@@ -7,8 +7,8 @@ from flask import request,session,render_template,\
 from .admin_app import admin_app
 from models import User
 from libs import db, csrf
-import json
-
+from flask import  jsonify
+from forms.account_form import AdminEditInfoForm
 
 @admin_app.route("/user/list/<int:page>", methods=['get', "post"])
 @admin_app.route("/user/list", defaults={"page":1},methods=['get', "post"])
@@ -16,7 +16,7 @@ def userList(page):
     if request.method == "POST":
         q = request.form['q']
         condition = {request.form['field']:q}
-        #filter_by
+        # filter_by
         # users = User.query.filter_by(**condition).all()
         # filter
         # like
@@ -70,14 +70,30 @@ def deleteUser():
 # 用户信息修改
 @admin_app.route("/user/edit/<int:user_id>", methods=['get', 'post'])
 def editUser(user_id):
-    user = User.query.get(user_id)
-    if request.method == "POST":
-        user.username = request.form['username']
-        user.realname = request.form['name']
-        user.sex = request.form['sex']
-        user.mylike = "|".join(request.form.getlist('like'))
-        user.city = request.form['city']
-        user.intro = request.form['intro']
-        db.session.commit()
-        return redirect(url_for(".userList"))
-    return render_template("admin/user/user_edit.html", user=user)
+    form = AdminEditInfoForm()
+    user = User.query.get_or_404(user_id)
+
+    if form.validate_on_submit():
+        message = {"res":"fail"}
+        user.realname = form.data['name']
+        user.sex = form.data['sex']
+        user.mylike = "|".join(form.data['like'])
+        user.city = form.data['city']
+        user.intro = form.data['intro']
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        else:
+            message['res'] = "success"
+        return jsonify(message)
+    elif form.errors:
+        print(form.errors)
+    else:
+        form.name.data = user.realname
+        form.sex.data = user.sex
+        form.like.data = user.mylike.split("|")
+        form.city.data = user.city
+        form.intro.data = user.intro
+
+    return render_template("admin/user/user_edit.html", user_id=user_id, form=form)

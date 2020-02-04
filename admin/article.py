@@ -7,6 +7,7 @@ from .admin_app import admin_app
 from models import Article,Category
 from libs import db
 import json
+from flask import jsonify
 
 @admin_app.route("/article/post", methods=['get','post'])
 def article_post():
@@ -59,31 +60,49 @@ def article_list(page):
     # 无论搜索还是默认查看，都是翻页处理
     articles = res.items
     pageList = res.iter_pages()
-
+    pages = res.pages
+    total = res.total
 
     return render_template("admin/article/article_list.html", articles=articles,
-                           pageList=pageList
+                           pageList=pageList,
+                           pages=pages,
+                           total=total
                            )
 
 
 # 根据文章id删除文章
-@admin_app.route("/article/delete/<int:article_id>", methods=['post'])
-def article_delete(article_id):
-    article = Article.query.get(article_id)
-    db.session.delete(article)
-    db.session.commit()
-    return redirect(url_for(".article_list"))
+@admin_app.route("/article/delete", methods=['post'])
+def article_delete():
+    article_id = int(request.form.get("article_id"))
+    message = {"res":"fail","id":article_id, "type":"del"}
+    if article_id:
+        article = Article.query.get(article_id)
+        if article:
+            try:
+                db.session.delete(article)
+                db.session.commit()
+            except Exception as e:
+                print(e)
+            else:
+                message['res'] = "success"
+    return jsonify(message)
 
 
-# 文章修改
-@admin_app.route("/article/edit/<int:article_id>", methods=['get', 'post'])
-def article_edit(article_id):
-    article = Article.query.get(article_id)
-    if request.method == "POST":
-        article.cate_id = request.form['cate']
-        article.title = request.form['title']
-        article.intro = request.form['intro']
-        article.content= request.form['content']
-        db.session.commit()
-        return redirect(url_for(".article_list"))
-    return render_template("admin/article/article_edit.html", article=article)
+
+# 文章推荐
+@admin_app.route("/article/recommend", methods=["post"])
+def article_recommend():
+    article_id = int(request.form.get("article_id"))
+    message = {"res":"fail","id":article_id,"type":"recommend"}
+    if article_id:
+        article = Article.query.get(article_id)
+        if article:
+            article.is_recommend = 1
+            try:
+                db.session.commit()
+            except Exception as e:
+                print(e)
+            else:
+                message['res'] = "success"
+    return jsonify(message)
+

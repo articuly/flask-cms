@@ -1,4 +1,4 @@
-{% extends "member/member_base.html" %}
+{% extends "admin/admin_base.html" %}
 <!DOCTYPE html>
 <html>
 
@@ -13,86 +13,70 @@
 
 						<h3>用户信息修改</h3>
 						 <div class="body">
-							<form action="" method="post">
-								
-							<div class="form-group">
-								<label for="name">姓名:</label>
-								<input class="form-control" type="text" name="name" id="name" value="{{ user.realname }}"  />
-							</div>
-							
-							<div class="form-group">
-								<label for="username">用户名:</label>
-								<input class="form-control"type="text" name="username" id="username" value="{{ user.username }}" />
-							</div>
+
+                             <div class="alert alert-info" id="message" role="alert"></div>
+						      {%  for field in form %}
+
+                                {% if field.widget.input_type!="hidden" %}
+                                        <div class="form-group">
+                                            {{ field.label }}
+                                            {{ field }}
+                                        </div>
+                                    {% else %}
+                                        {{ field }}
+
+                                {% endif %}
+                            {% endfor %}
 
 							<div class="form-group">
-								<label class="radio-inline">
-									<input  type="radio" name="sex" id="sex1" value="0"
-                                       {% if user.sex==0 %} checked {% endif %}
-                                    />女
-								</label>
-								<label class="radio-inline">
-
-									<input type="radio" name="sex" id="sex2" value="1"
-                                      {% if user.sex==1 %} checked {% endif %}
-                                    />男
-								</label>
-							</div>
-							<div class="form-group">
-								<label class="checkbox-inline">
-									<input type="checkbox" name="like" id="like1"
-                                           {% if user.mylike.find("睡觉")!=-1 %} checked {% endif %}
-                                           value="睡觉" />睡觉
-								</label>
-								<label class="checkbox-inline">
-
-									<input type="checkbox" name="like" id="like2"
-                                           {% if user.mylike.find("旅游")!=-1 %} checked {% endif %}
-                                           value="旅游" />旅游
-								</label>
-								<label class="checkbox-inline">
-
-									<input type="checkbox" name="like" id="like3"
-                                           {% if user.mylike.find("看书")!=-1 %} checked {% endif %}
-                                           value="看书" />看书
-								</label>
-								<label class="checkbox-inline">
-
-									<input type="checkbox" name="like" id="like4" value="唱歌"
-                                           {% if user.mylike.find("唱歌")!=-1 %} checked {% endif %}
-                                    />唱歌
-								</label>
-							</div>
-							<div class="form-group">
-							<select name="city">
-								<option value ="">请选择城市</option>
-								<option value ="010"
-                                      {% if user.city=="010" %} selected {% endif %}
-                                >北京</option>
-
-								<option value ="021"
-                                      {% if user.city=="021" %} selected {% endif %}
-                                >上海</option>
-								<option value ="0512"
-                                      {% if user.city=="0512" %} selected {% endif %}
-                                >苏州</option>
-							</select>
-							</div>
-							<div class="form-group">
-							<textarea name="intro" rows="5" cols="10" class="form-control" >
-								{{ user.intro }}
-							</textarea>
-							</div>
-							<div class="form-group">
-							<input class="btn" type="submit" name="submit" id="btn1" value="修改信息" />
+							<input class="btn" type="button" name="submit" id="btn1" value="修改信息" />
 							<input class="btn" type="reset" name="reset" id="btn2" value="重设" />
 							</div>
-							</form>
+
 						 </div>
-					</article>
+
 				</div>
 			</div>
 		</div>
+            <script>
+                window.onload=function() {
+                    $("#btn1").on("click", function () {
+                        name = $("#name").val()
+                        sex = $('[name=sex]:checked').val()
+                        like = []
+
+                        $('[name=like]:checked').each(
+                            function (index, item) {
+                                like.push($(item).val())
+                            }
+                        )
+
+                        city = $('[name=city]').val()
+                        intro = $('[name=intro]').val()
+                        data = {
+                            name: name,
+                            sex: sex,
+                            like: like,
+                            city: city,
+                            intro: intro
+
+                        }
+
+                        $.ajax({
+                            type: "post",
+                            url: '{{ url_for("admin_app.editUser", user_id=user_id) }}',
+                            data: data,
+                            dataType: "json",
+                            beforeSend:function(xhr){
+                                xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token()}}')
+                            },
+                            success: function (data) {
+                                if (data.res == "success") {
+                                    $("#message").html("修改成功<a href='javascript:window.close()'>关闭</a>")
+                                }
+                            }
+                        })
+                    })
+                }
+            </script>
 	{%  endblock %}
-	</body>
-</html>

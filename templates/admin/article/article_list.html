@@ -8,6 +8,15 @@
             margin-right: 30px;
 
         }
+        .del{
+            color:red;
+            border: 1px solid red;
+            text-decoration: line-through;
+        }
+        .recommend{
+            color: blue ;
+            border: 1px solid blue;
+        }
 {% endblock %}
 {% block content %}
 
@@ -77,14 +86,14 @@
                             <th>操作</th>
                         </tr>
                         {% for article in articles %}
-                        <tr>
+                        <tr id="article_{{ article.id }}">
                             <td>{{ article.id }}</td>
-                            <td><a href="{{ url_for("article_app.view", article_id=article.id) }}">{{ article.title }}</a></td>
+                            <td><a href="{{ url_for("article_app.view", article_id=article.id) }}" target="_blank">{{ article.title }}</a></td>
                             <td>{{ article.author }}</td>
                             <td>{{ article.pubdate }}</td>
                             <td>
-                                <a href="{{ url_for("admin_app.article_edit", article_id=article.id) }}">修改</a>
-                                <a href="#" class="del" data-url="{{ url_for("admin_app.article_delete", article_id=article.id) }}">删除</a>
+                                <a href="javascript:recommend_article({{ article.id }});"  >推荐</a>
+                                <a href="javascript:del_article({{ article.id }});" >删除</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -106,26 +115,43 @@
 			</div>
 		</div>
      <script>
-        window.onload=function(){
-            table = $(".table")
-            table.on("click",del)
-            function del(e){
-                if (e.target.className=="del") {
-                    url = e.target.dataset.url
+     // 删除处理
+      function del_article(article_id){
+          url = '{{ url_for("admin_app.article_delete")}}'
+          send_data(url,{"article_id":article_id})
+      }
+      // 推荐处理
+      function recommend_article(article_id){
+          url = '{{ url_for("admin_app.article_recommend")}}'
+          send_data(url,{"article_id":article_id})
+      }
+
+      function send_data(url,data){
                     $.ajax({
                         url: url,
                         type: "post",
-                       /* beforeSend:function(xhr){
+                        data:data,
+                        beforeSend:function(xhr){
                             xhr.setRequestHeader("X-CSRFToken", "{{  csrf_token() }}")
-                        },*/
+                        },
                         success: function (data) {
-                            console.log(data)
+                            if (data.res=="success"){
+                                // 根据删除还是推荐
+                                // 设置操作行样式
+
+                                $("#article_"+data.id).toggleClass(data.type)
+                            }
+
                         }
                     })
                 }
 
-            }
-        }
+
+        {#window.onload=function(){#}
+        {#    table = $(".table")#}
+        {#    table.on("click",del)#}
+        {#    #}
+        {# } #}
     </script>
 {% endblock %}
 
