@@ -1,20 +1,141 @@
 {% extends "base.html" %}
+{% block style %}
+<style>
+.media{
+    border: 1px solid #efefef;
+    padding: 5px;
+    border-radius:5px;
 
+    }
+</style>
+{% endblock %}
 		{% block content %}
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row">
 
                     <div class="main col-md-12 col-lg-12 col-xs-12 col-sm-12" >
-                        <article class="content">
-                            <h1>{{ article.title }}</h1>
-                             <div class="body">
-                                 ﻿<blockquote>
-                                    {{ article.intro }}
-                                  </blockquote>
-                                    {{ article.content |safe }}
+
+                        <h1>{{ article.title }}</h1>
+                         <div class="body">
+                             <blockquote>
+                                {{ article.intro }}
+                             </blockquote>
+                                {{ article.content |safe }}
+                         </div>
+                         <div class="panel panel-default">
+
+                             <div class="panel-body">
+                                 <form action="" class="form">
+                                     <div class="form-group">
+                                         {{ form.csrf_token }}
+                                       {{ form.comment.label }}
+                                         {{ form.comment }}
+                                     </div>
+                                     <div class="form-group">
+                                         <input type="button" name="btn" class="btn btn-primary pull-right " value="立即发布">
+                                     </div>
+                                 </form>
                              </div>
-                        </article>
+                         </div>
+
+                         <ul class="media-list" id="comments_list">
+
+                                   </ul>
+
+<div class="form-group">
+    <input type="button"  value="加载更多" class="form-control load_btn" />
+</div>
                     </div>
                 </div>
             </div>
+            <script>
+                 btn = document.querySelector(".btn")
+                 csrf_token = '{{ csrf_token() }}'
+                 current_page = 1
+
+                 function createComments(comments_data){
+                     comment_lists = ""
+                     for (i=0; i<comments_data.length; i++) {
+                         avatar = '{{ url_for("static", filename="img/avatar-small.jpg") }} '
+                         d = (new Date(comments_data[i]['timestamp']))
+                         comment =   "发表时间："+d.toLocaleString()+"<br>"+comments_data[i].body
+                         observer = comments_data[i].observer
+
+                         comment_tpl = "<li class=\"media\">" +
+                             "<div class=\"media-left\">" +
+                             "<a href=\"#\" >" +
+                             "<img class=\"media-object\" src=\""
+                             + avatar + "\" >" +
+                             "</a>" +
+                             "<p>" + observer + "</p>" +
+                             "</div>" +
+                             "<div class=\"media-body\">" +
+                             comment +
+                             "</div>" +
+                             "</li>"
+                         comment_lists += comment_tpl
+                     }
+                     return comment_lists
+                 }
+                 btn.onclick = function(){
+                     comment_data = document.getElementById("comment").value
+                     article_id = "{{ article_id }}"
+                     reply_id = 0
+
+                     $.ajax({
+                         url:'{{ url_for("member_app.publish") }}',
+                         type: "post",
+                         data: {"comment":comment_data, "article_id":article_id, "reply_id":0},
+                         dataType:"json",
+                         beforeSend:function(xhr){
+                            xhr.setRequestHeader("X-CSRFToken", csrf_token)
+                         },
+                         success:function(data){
+
+                             if (data.res=="success") {
+
+                                 comment_lists = createComments({"body": comment_data,"observer": '{{ username}}'})
+
+                                 $("#comments_list").prepend(comment_lists)
+                                 $("#comment").val("")
+                             }
+                         }
+
+                     })
+                 }
+
+
+                 function load(){
+
+                     $.ajax({
+                         type:"get",
+                         url: '{{ url_for("article_app.getComments") }}',
+                         data: {'page':current_page, 'article_id':{{ article.id }} },
+                         dataType: "json",
+                         success: function(data){
+
+                             if (data.res=="success"){
+
+
+                                 if (data.next_page== null){
+                                     $(".load_btn").unbind()
+                                     $(".load_btn").val("到底了")
+                                 }
+
+                                 current_page = data.next_page
+                                 comment_lists = createComments(data.comments)
+
+                                 $("#comments_list").prepend(comment_lists)
+                             }
+                         }
+                     })
+                 }
+
+
+                 window.onload = function(){
+                     $(".load_btn").on("click",load)
+                     load()
+                 }
+
+            </script>
 		{% endblock %}

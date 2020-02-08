@@ -4,16 +4,14 @@
     <head>
 		<meta charset="utf-8">
 		<title></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="css/bootstrap.css") }}"/>
 	    <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="css/bootstrap-theme.css") }}"/>
 		<style type="text/css">
 			body{
 				padding-top: 52px;
 			}
-			.media a>img{
-				width: 120px;
 
-			}
 			#left_menu>li{
 				width:100%;
 			}
@@ -36,6 +34,7 @@
 			}
 
 		</style>
+       {% block style %}{%  endblock %}
 	</head>
 {%  endblock %}
 <body>

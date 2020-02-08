@@ -25,3 +25,8 @@ def createBatchUsers():
                     intro="")
         db.session.add(user)
     db.session.commit()
+
+
+def queryObjToDicts(obj, keys):
+    lists = [{key: getattr(item, key) for key in keys} for item in obj]
+    return lists

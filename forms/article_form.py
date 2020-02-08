@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, \
                     SubmitField, BooleanField, \
                     SelectMultipleField,widgets,\
                     RadioField, SelectField,TextAreaField,\
-                    HiddenField
+                    HiddenField,IntegerField
 
 from flask_ckeditor import CKEditorField
 from wtforms.validators import DataRequired, Length, \
@@ -46,3 +46,12 @@ class ArticleSearchForm(FlaskForm):
                         render_kw={"class":"form-control"}
                     )
 
+
+class CommentForm(FlaskForm):
+    comment = TextAreaField("发表评论",
+                            validators=[DataRequired()],
+                            render_kw={"class":"form-control"}
+                            )
+    article_id = IntegerField("文章id",
+                              validators=[DataRequired()]
+                              )

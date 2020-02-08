@@ -30,6 +30,7 @@ class Article(db.Model):
     is_recommend = db.Column(db.Integer)
     pubdate = db.Column(db.DateTime, default=datetime.utcnow)
     cate_id = db.Column(db.Integer, db.ForeignKey("category.cate_id"))
+    comments = db.relationship("Comment", back_populates='article', cascade='all, delete-orphan')
 
 class Category(db.Model):
     cate_id = db.Column(db.Integer, primary_key=True)
@@ -37,3 +38,28 @@ class Category(db.Model):
     cate_name = db.Column(db.String, unique=True)
     cate_order = db.Column(db.Integer, default=0)
     articles = db.relationship("Article")
+
+class Comment(db.Model):
+    '''
+    评论模型
+
+    '''
+    comment_id = db.Column(db.Integer, primary_key=True)
+    observer = db.Column(db.String(30))
+    email = db.Column(db.String(254))
+    site = db.Column(db.String(255))
+    body = db.Column(db.Text)
+    from_admin = db.Column(db.Boolean, default=False)
+    reviewed = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    replied_id = db.Column(db.Integer, db.ForeignKey('comment.comment_id'))
+    article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
+
+    article = db.relationship('Article', back_populates='comments')
+    replies = db.relationship('Comment', back_populates='replied', cascade='all, delete-orphan')
+    # 自引用
+    replied = db.relationship('Comment', back_populates='replies', remote_side=[comment_id])
+    # Same with:
+    # replies = db.relationship('Comment', backref=db.backref('replied', remote_side=[id]),
+    # cascade='all,delete-orphan')
